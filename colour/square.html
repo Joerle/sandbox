@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <LINK rel="icon" href="http://www.joerle.ca/images/rainbow-lines.png" />
+    <LINK rel="shortcut icon" href="http://www.joerle.ca/images/rainbow-lines.png" />
+    <title>What time is it?</title>
+    <script src="jquery-1.11.1.min.js"></script>
+    <script src="util.js"></script>
+    <script src="convert.js"></script>
+    <script src="colour.js"></script>
+    <link rel="stylesheet" type="text/css" href="square.css" />
+    <script>
+jQuery(function () {
+    jQuery(".refbody").hide();
+    jQuery(".refnum").click(function (event) {
+        jQuery(this.nextSibling).toggle();
+        event.stopPropagation();
+    });
+    jQuery("body").click(function (event) {
+        jQuery(".refbody").hide();
+    });
+});
+</script>
+</head>
+<body>
+<div id="console">
+    <span>
+        <input type="radio" name="mode" value="trad" checked>Traditional
+        <span class="ref">
+            <span class="refnum">[?]</span>
+            <span class=""refbody" style="display:none;">Information</span>
+        </span>
+        
+        <br />
+        <input type="radio" name="mode" value="adpt">Adapted
+    </span>
+    <span id="dayOfYear"></span>
+</div>
+
+<div id="clock" class="clock">
+<div id="center">
+    <div id="hr">
+        <div class="time">24</div>
+        <div class="rgb">255</div>
+        <div class="hex">FF</div>
+        <div class="hue">359</div>
+        <div id="min">
+            <div class="time">15</div>
+            <div class="rgb">255</div>
+            <div class="hex">FF</div>
+            <div class="hue">359</div>
+            <div id="sec">
+                <div class="time">59</div>
+                <div class="rgb">255</div>
+                <div class="hex">FF</div>
+                <div class="hue">359</div>
+                <div id="info">
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+</body>
+</html>

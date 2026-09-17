@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <LINK rel="icon" href="http://www.joerle.ca/images/rainbow-lines.png" />
+    <LINK rel="shortcut icon" href="http://www.joerle.ca/images/rainbow-lines.png" />
+    <title>Demo</title>
+    <script src="jquery-1.11.1.min.js"></script>
+    <script src="util.js"></script>
+    <script src="batt.js"></script>
+    <link rel="stylesheet" type="text/css" href="batt.css" />
+</head>
+<body>
+
+<div id="form">
+<form id="newUnit">
+<table>
+    <tr>
+        <td><label for="name">Name:</label></td>
+        <td><input id="name" type="text" maxlength="16" size="16" autofocus /></td>
+    </tr>
+    <tr>
+        <td><label for="atk">Base Atk:</label></td>
+        <td><input id="atk" type="number" class="int" min="0" max="20" step="1" value="0" /></td>
+    </tr>
+    <tr>
+        <td>Damage:</td>
+        <td>
+            <table>
+                <tr>
+                    <td><label for="1d4">1d4</label>&nbsp;<input type="radio" name="dice" value="1d4" id="1d4" /></td>
+                    <td><label for="1d6">1d6</label>&nbsp;<input type="radio" name="dice" value="1d6" id="1d6" checked="checked" /></td>
+                </tr>
+                <tr>
+                    <td><label for="1d8">1d8</label>&nbsp;<input type="radio" name="dice" value="1d8" id="1d8" /></td>
+                    <td><label for="2d4">2d4</label>&nbsp;<input type="radio" name="dice" value="2d4" id="2d4" /></td>
+                </tr>
+                <tr>
+                    <td><label for="1d10">1d10</label>&nbsp;<input type="radio" name="dice" value="1d10" id="1d10" /></td>
+                    <td><label for="1d12">1d12</label>&nbsp;<input type="radio" name="dice" value="1d12" id="1d12" /></td>
+                </tr>
+                <tr>
+                    <td><label for="2d6">2d6</label>&nbsp;<input type="radio" name="dice" value="2d6" id="2d6" /></td>
+                    <td><label for="2d8">2d8</label>&nbsp;<input type="radio" name="dice" value="2d8" id="2d8" /></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td><label for="str">Str Bonus:</label></td>
+        <td><input id="str" type="number" class="int" min="-5" max="5" step="1" value="0" /></td>
+    </tr>
+    <tr>
+        <td><label for="ac">AC:</label></td>
+        <td><input id="ac" type="number" class="int" min="5" max="40" step="1" value="10" /></td>
+    </tr>
+    <tr>
+        <td><label for="hp">Max HP:</label></td>
+        <td><input id="hp" type="number" class="int" min="4" max="350" step="1" value="8" /></td>
+    </tr>
+    <tr>
+        <td><label for="addHero">Hero:</label><input type="radio" name="type" value="hero" id="addHero" /></td>
+        <td><label for="addMon">Monster:</label><input type="radio" name="type" value="mon" id="addMon" checked="checked" /></td>
+    </tr>
+    <tr>
+        <td><input type="button" value="Add" id="btnAdd" /></td>
+        <td><input type="reset" value="Clear" id="btnClr" /></td>
+    </tr>
+</table>
+</form>
+<div id="presets">
+Preset units:<br />
+<input type="button" value="Saoilonn" id="saoilonn" class="hero" />
+<input type="button" value="Brandrill" id="brandrill" class="hero" />
+<input type="button" value="Skeleton" id="skeleton" class="mon" />
+<input type="button" value="Zombie" id="zombie" class="mon" />
+</div>
+
+<div id="units">
+    <div id="heroes"><input type="button" value="Clear Heroes" id="btnClrHero" class="hero" /></div>
+    <div id="monsters"><input type="button" value="Clear Monsters" id="btnClrMon" class="mon" /></div>
+</div>
+
+<script>
+jQuery(document).ready(function () {
+
+    function setFields(theName, theAtk, theDmg, theStr, theAC, theHP, theType) {
+        $("#newUnit #name").val(theName);
+        $("#newUnit #atk").val(theAtk);
+        $("#newUnit #"+theDmg).click();
+        $("#newUnit #str").val(theStr);
+        $("#newUnit #ac").val(theAC);
+        $("#newUnit #hp").val(theHP);
+        $("#newUnit [name=type][value="+theType+"]").click();
+    }
+
+    function loadPreset(btn) {
+        var unitName = $(btn).val();
+        if (unitName === "Saoilonn") {
+            setFields("Saoilonn", 6, "2d8", 5, 19, 60, hClass);
+        } else if (unitName === "Brandrill") {
+            setFields("Brandrill", 4, "1d6", 3, 21, 40, hClass);
+        } else if (unitName === "Skeleton") {
+            setFields("Skeleton", 4, "1d8", 2, 14, 30, mClass);
+        } else if (unitName === "Zombie") {
+            setFields("Zombie", 3, "1d6", 3, 13, 30, mClass);
+        }
+    }
+
+    $("#btnAdd").click(function () {
+        var dice = $("#newUnit [name=dice]:checked").val(),
+            low = dice.substr(0, 1),
+            high = Number(dice.substr(2)) * 2;
+
+        var newUnit = new Unit($("#newUnit #name").val(),
+            $("#newUnit #atk").val(),
+            low, high,
+            $("#newUnit #str").val(),
+            $("#newUnit #ac").val(),
+            $("#newUnit #hp").val(),
+            $("#newUnit [name=type]:checked").val());
+
+        var clrBtn = (newUnit.getType() === hClass) ? $("#btnClrHero") : ((newUnit.getType() === mClass) ? $("#btnClrMon") : "");
+        $(clrBtn).before(newUnit.toHtml());
+    });
+
+    $("#btnClr").click(function () {
+        $("#newUnit :text").val("");
+    });
+
+    $("#btnClrHero, #btnClrMon").click(function () {
+        clearUnits($(this).attr("class"));
+        $(this).siblings("div").remove();
+    });
+
+    $("#presets :button").click(function () {
+        loadPreset(this);
+    });
+
+    $("#units #heroes, #units #monsters").on("click", "div input:button", function () {
+        removeUnit($(this).attr("id"), $(this).attr("class"));
+        $(this).parent().remove();
+    });
+
+});
+
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: courier new,  monospace;
+    font-size: 72pt;
+}
+
+#console {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 12pt;
+    z-index: 100;
+}
+
+#clock {
+    height: 345px;
+    width: 100%;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 15%;
+    right: 0;
+}
+
+#center {
+    width: 535px;
+    height: 100%;
+    margin: 0 auto;
+}
+
+#clock div div {
+    float: left;
+    height: 115px;
+}
+
+#hr, #min , #sec {
+    height: 100%;
+}
+
+.time {
+    text-align: center;
+    width: 100%;
+}
+
+div.rgb, div.hex, div.hue {
+    clear: both;
+    width: 100%;
+    text-align: center;
+}
+
+div.rgb {
+    font-size: 0.8em;
+}
+
+div.hex, div.hue {
+    font-size: 0.7em;
+}
+
+#hr div.rgb {
+    background-color: rgb(255, 0, 0);
+}
+#min div.rgb {
+    background-color: rgb(0, 255, 0);
+}
+#sec div.rgb {
+    background-color: rgb(0, 0, 255);
+}
+
+#hr div.hex {
+    background-color: #F00;
+}
+#min div.hex {
+    background-color: #0F0;
+}
+#sec div.hex {
+    background-color: #00F;
+}

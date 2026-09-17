@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <LINK rel="icon" href="http://www.joerle.ca/images/rainbow-lines.png" />
+    <LINK rel="shortcut icon" href="http://www.joerle.ca/images/rainbow-lines.png" />
+    <title>D10 Roller</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+body {
+    padding: 0;
+    margin: 0;
+    background-color: #112211;
+    color: #4B4;
+}
+body, input[type="number"] {
+    font-family: courier new,  monospace;
+    font-size: 12pt;
+}
+    input,
+    input[type="number"] {
+    background-color: #005500;
+    color: #00FF00;
+    border: 2px solid #007700;
+}
+div {
+    margin: 10px;
+    display: block;
+}
+h1 {
+    font-size: 40pt;
+}
+table, tr, td {
+    border: 0;
+    border-collapse: collapse;
+}
+input[type="number"] {
+    width: 40px;
+}
+input[type="button"] {
+    margin: 1px 0px 2px 1px;
+}
+#roller {
+    margin: auto;
+    max-width: 600px;
+}
+.int, .right {
+    text-align: right;
+}
+h1, .center {
+    text-align: center;
+}
+.success {
+    font-weight: bolder;
+    background-color: #004400;
+    padding: 0px 2px;
+}
+
+@media only screen and (max-device-width: 1000px) {
+    body {
+        font-size: 2.5em;
+        padding: 0 10px;
+    }
+    #roller {
+        width: 100%;
+        max-width: 999px;
+    }
+    input,
+    input[type="number"] {
+        font-size: 1em;
+        padding: 6px 14px;
+    }
+    input[type="button"], #btnPlus, #btnMinus {
+        -webkit-transform: scale(1.5) !important;
+        margin: 16px 12px 16px 12px;
+        padding: 0 16px;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+        -webkit-transform: scale(3) !important;
+        margin: 15px 15px;
+    }
+}
+</style>
+</head>
+<body>
+<h1>Simple D10 roller</h1>
+<table id="roller">
+    <thead>
+        <tr>
+            <td class="right" colspan="3" width="50%"><label for="numberOfDice">Number of Dice:</label></td>
+            <td colspan="3" width="50%">
+                <input id="numberOfDice" type="number" class="int" min="1" step="1" value="3" autofocus />
+                <input type="button" value="+" id="btnPlus" onclick="plus()" />
+                <input type="button" value="-" id="btnMinus" onclick="minus()"  />
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td width="40%" colspan="2" class="right"><label for="10again">10-Again:</label></td>
+            <td width="10%" colspan="1"><input type="radio" name="reroll" value="10" id="10again" checked /></td>
+
+            <td width="40%" colspan="2" class="right">8s succeed:</td>
+            <td width="10%" colspan="1"><input type="radio" name="successIs" value="8" id="8isSuccess" checked /></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="right"><label for="9again">9-Again:</label></td>
+            <td colspan="1"><input type="radio" name="reroll" value="9" id="9again" /></td>
+
+            <td colspan="2" class="right">9s succeed:</td>
+            <td colspan="1"><input type="radio" name="successIs" value="9" id="9isSuccess" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="right"><label for="8again">8-Again:</label></td>
+            <td colspan="1"><input type="radio" name="reroll" value="8" id="8again" /></td>
+
+            <td colspan="2" class="right">7s succeed:</td>
+            <td colspan="1"><input type="radio" name="successIs" value="7" id="7isSuccess" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="right"><label for="0again">None:</label></td>
+            <td colspan="1"><input type="radio" name="reroll" value="99" id="0again" /></td>
+
+            <td colspan="2" class="right">10s succeed:</td>
+            <td colspan="1"><input type="radio" name="successIs" value="10" id="10isSuccess" /></td>
+        </tr>
+        <tr>
+            <td class="right" colspan="5"><label for="rote">Re-roll failures (rote action):</label></td>
+            <td colspan="1"><input type="checkbox" value="true" id="rote" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="center">
+                <input type="button" value="Roll" id="btnRoll" onclick="roll()" />
+            </td>
+            <td colspan="2" class="center">
+                <input type="button" value="Chance" id="btnChance" onclick="rollChance()" />
+            </td>
+            <td colspan="2" class="center">
+                <input type="button" value="Clear" id="btnClr" onclick="clearResults()" />
+            </td>
+        </tr>
+    </tbody>
+    <tfoot id="results">
+        <tr>
+            <td colspan="6">Results:</td>
+        </tr>
+    </tfoot>
+</table>
+
+<script type="text/javascript">
+const diceCup = function () {
+    let rollResult = 0,
+        resultList = [],
+        successes = 0,
+        rerolls = 0,
+        successIs;
+    
+    function addRow(text) {
+        $("#results").append( "<tr class=\"result\"><td colspan=\"6\">" + text + "</td></tr>");
+    }
+
+    function d10() {
+        rollResult = Math.ceil(Math.random() * 10);
+    }
+
+    function rollDie() {
+        d10();
+
+        if (rollResult >= successIs) {
+            resultList.push("<span class='success'>" + rollResult + "</span>");
+            successes++;
+        } else {
+            resultList.push(rollResult);
+        }
+    }
+
+    function reroll() {
+        rerolls++;
+        rollDie();
+    }
+
+    return {
+        tossDice: function () {
+            let dice = $("#numberOfDice").val();
+            const rollAgain = $("[name='reroll']:checked").val(),
+                rerollFailure = $("#rote").prop("checked");
+            successIs = $("[name='successIs']:checked").val();
+
+            if (dice < 1) {
+                dice = 1;
+                $("#numberOfDice").val(dice);
+            }
+
+            for (var i = 0; i < dice; i++) {
+                rollDie();
+                if (rollResult < successIs && rerollFailure) {
+                    reroll();
+                }
+                while (rollResult >= rollAgain) {
+                    reroll();
+                }
+            }
+
+            let msg = "Rolled " + dice + (dice == 1 ? " die" : " dice")
+                + " with <strong>" + successes
+                    + (successes == 1 ? " success" : " successes") + "</strong>"
+            if (rollAgain <= 10) {
+                msg += " and " + rerolls + " rerolls";
+            }
+            msg += "<br />{" + resultList.join(", ") + "}";
+
+            addRow(msg);
+        },
+        rollChance: function () {
+            d10();
+            msg = "<strong>" + (rollResult == 10 ? "Success!" : "Failure!") + "</strong>"
+                + " With a " + rollResult + " on a chance die.";
+
+            addRow(msg);
+        }
+    };
+};
+
+
+function roll() {
+    const newDiceCup = diceCup();
+    newDiceCup.tossDice();
+}
+
+function rollChance() {
+    const newDiceCup = diceCup();
+    newDiceCup.rollChance();
+}
+
+function clearResults() {
+    jQuery(".result").remove();
+}
+
+function plus() {
+    let dice = jQuery("#numberOfDice").val();
+    jQuery("#numberOfDice").val(++dice);
+}
+
+function minus() {
+    let dice = $("#numberOfDice").val();
+    if (dice > 1) {
+        jQuery("#numberOfDice").val(--dice);
+    }
+}
+
+</script>
+
+</body>
+</html>

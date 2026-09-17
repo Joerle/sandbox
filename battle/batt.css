@@ -1,0 +1,78 @@
+body {
+    font-family: courier new,  monospace;
+    font-size: 12pt;
+    padding: 0;
+    margin: 0;
+}
+div {
+    margin: 10px;
+    display: block;
+}
+div div {
+    margin: 5px;
+}
+table, tr, td {
+    border: 0;
+}
+input[type="number"] {
+    width: 35px;
+}
+input[type="button"] {
+    margin: 1px 0px 2px 1px;
+}
+
+#newUnit {
+    width: 250px;
+}
+#newUnit input {
+}
+#newUnit  table table td {
+    font-size: 12px;
+    line-height: 6px;
+    text-align: right;
+}
+#presets, #newUnit {
+    clear: none;
+    float: left;
+}
+#presets input {
+    clear: left;
+    float: left;
+}
+#units {
+    min-width: 300px;
+    min-height: 300px;
+}
+#heroes, #monsters {
+    width: 40%;
+    position: relative;
+}
+#heroes {
+    clear: left;
+    float: left;
+}
+#monsters {
+    float: right;
+    clear: none;
+}
+#btnClrHero, #btnClrMon {
+    display: block;
+    margin: 1px auto 2px;
+}
+
+#heroes, .hero {
+    background-color: #EEF;
+    border: 2px solid #00a;
+}
+#monsters, .mon {
+    background-color: #FEE;
+    border: 2px solid #a00;
+}
+
+div.mon, div.hero {
+    padding: 0 4px 2px;
+}
+
+.int {
+    text-align: right;
+}

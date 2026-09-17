@@ -1,0 +1,53 @@
+<html>
+<head>
+<style>
+#line {
+    height: 780px;
+    opacity: 0.45;
+    position: absolute;
+    width: 983px;
+    z-index: 10;
+}
+#map {
+    left: 25px;
+    position: absolute;
+    top: -32px;
+    width: 1017px;
+    z-index: 1;
+}
+#control {
+   position: fixed;
+    top: 825px;
+}
+.slider {
+    width: 955px;
+}
+</style>
+    <script src="../jquery-1.11.1.min.js"></script>
+</head>
+<body>
+<img src="topograph.jpg" id="line" />
+<img src="map.png" id="map" />
+<div id="control">
+	<input min="0" max="1" step="0.01" type="range" class="slider" id="opacitySlider" value="0.45" /><span id="opacityVal">45%</span> Opacity<br />
+	
+	<input min="0" max="1" step="0.20" type="range" class="slider" id="invertSlider" value="0.0" /><span id="invertVal">0%</span> Inversion
+</div>
+<script>
+jQuery(function () {
+    $("#opacitySlider").on("input", function () {
+        var opacity = $(this).val();
+        $("#line").css("opacity", opacity);
+        opacity = Math.round(opacity * 100) + "%";
+        $("#opacityVal").text(opacity);
+    });
+    $("#invertSlider").on("input", function () {
+        var inversion = $(this).val();
+        $("#map").css("filter", "invert("+inversion+")");
+        inversion = Math.round(inversion * 100) + "%";
+        $("#invertVal").text(inversion);
+    });
+});
+</script>
+</body>
+</html>

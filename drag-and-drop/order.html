@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" data-darkreader-mode="false" data-darkreader-scheme="light">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="talents.js"></script>
+<style>
+#content {
+    width: 95%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+#controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#controls button {
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
+#columns {
+    min-height: 300px;
+    display: flex;
+    align-items: stretch;
+    flex-flow: row wrap;
+    gap: 20px;
+    background-color: #fff;
+
+    div.group {
+        display: flex;
+        flex-direction: column;
+
+        h1, h2, h3, h4 {
+            margin: 0 0 10px;
+            text-align: center;
+        }
+
+        div.row {
+            display: flex;
+            align-items: stretch;
+            flex-flow: row nowrap;
+            flex: 1;
+        }
+
+        div.column {
+            min-height: 300px;
+            min-width: 200px;
+            width: auto;
+            flex: 0 1 auto;
+            border: 2px solid #111;
+            box-sizing: border-box;
+        
+
+            h3, h4 {
+                text-align: center;
+                margin: 0;
+                padding: 10px 0;
+                background-color: #bbb;
+                width: 100%;
+                border-bottom: 2px solid #111;
+            }
+
+            div.level {
+                margin: 15px 5px;
+                padding: 5px;
+                border: 1px solid #cc3;        
+
+                h4 {
+                    background-color: #ddd;
+                    border-bottom: 1px solid #cc3;
+                }
+
+                div.talent {
+                    margin: 5px 15px;
+                    padding: 5px;
+                    border: 1px solid #ccc;
+                    cursor: grab;
+                }
+            }
+
+        }
+
+        div.column.divider {
+            min-width: 5px;
+            width: 5px;
+            flex: 0 0 5px;
+            margin: 0 10px;
+            background-color: #333;
+            border: 0;
+        }
+    }
+}
+    </style>
+</head>
+<body>
+
+<div id="content">
+    <div id="columns">
+        <div id="utility" class="group">
+            <h2>Utility Talents</h2>
+            <div class="row">
+                <div class="column selected">
+                    <h3>Selected</h3>
+                    <div class="level one" data-level="one"><h4>1st Level</h4></div>
+                    <div class="level two" data-level="two"><h4>2nd Level</h4></div>
+                    <div class="level three" data-level="three"><h4>3rd Level</h4></div>
+                </div>
+                <div class="column divider"></div>
+                <div class="column available">
+                    <h3>Available</h3>
+                    <div class="level one" data-level="one"><h4>1st Level</h4></div>
+                    <div class="level two" data-level="two"><h4>2nd Level</h4></div>
+                    <div class="level three" data-level="three"><h4>3rd Level</h4></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="infusion" class="group">
+            <h2>Infusions</h2>
+            <div class="row">
+                <div class="column selected">
+                    <h3>Selected</h3>
+                    <div class="level one" data-level="one"><h4>1st Level</h4></div>
+                    <div class="level two" data-level="two"><h4>2nd Level</h4></div>
+                    <div class="level three" data-level="three"><h4>3rd Level</h4></div>
+                </div>
+                <div class="column divider"></div>
+                <div class="column available">
+                    <h3>Available</h3>
+                    <div class="level one" data-level="one"><h4>1st Level</h4></div>
+                    <div class="level two" data-level="two"><h4>2nd Level</h4></div>
+                    <div class="level three" data-level="three"><h4>3rd Level</h4></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="controls" class="row">
+        <div class="column"><button id="saveStateBtn" type="button">Save</button></div>
+        <div class="column"></div>
+        <div class="column"><button id="resetBtn" type="button">Reset</button></div>
+    </div>
+</div>
+<script>
+    $(function () {
+        function saveState() {
+            const state = {};
+
+            $('#utility, #infusion').each(function () {
+                const groupId = $(this).attr('id');
+                state[groupId] = {};
+
+                $(this).find('.column').each(function () {
+                    const columnClass = $(this).hasClass('selected') ? 'selected' : 'available';
+                    state[groupId][columnClass] = state[groupId][columnClass] || {};
+
+                    $(this).find('.level').each(function () {
+                        const level = $(this).data('level');
+                        state[groupId][columnClass][level] = $(this)
+                            .find('.talent')
+                            .map(function () {
+                                return $(this).data('id');
+                            })
+                            .get();
+                    });
+                });
+            });
+
+            localStorage.setItem('dragState', JSON.stringify(state));
+        }
+
+        function renderDefaultLayout(talents) {
+            $('.level').each(function () {
+                $(this).find('.talent').remove();
+            });
+
+            $.each(talents, function (_, talent) {
+                const div = $('<div>', {
+                    text: talent.text,
+                    class: 'talent',
+                    draggable: true,
+                    'data-id': talent.id,
+                    'data-level': talent.level,
+                    'data-type': talent.type
+                });
+
+                const groupId = talent.type || 'utility';
+                const columnClass = (talent.default || 'available');
+                $('#' + groupId + ' .column.' + columnClass + ' .level.' + talent.level).append(div);
+            });
+        }
+
+        function resetLayout() {
+            localStorage.removeItem('dragState');
+            renderDefaultLayout(TALENTS);
+        }
+
+        function restoreState() {
+            const saved = JSON.parse(localStorage.getItem('dragState')) || null;
+            if (!saved) return;
+
+            const hasSavedItems = Object.keys(saved).some(groupId =>
+                Object.keys(saved[groupId] || {}).some(columnId =>
+                    Object.keys(saved[groupId][columnId] || {}).some(level =>
+                        (saved[groupId][columnId][level] || []).length > 0
+                    )
+                )
+            );
+
+            if (!hasSavedItems) return;
+
+            const itemsById = {};
+
+            $('.talent').each(function () {
+                itemsById[$(this).data('id')] = $(this);
+            });
+
+            $('.level').each(function () {
+                $(this).find('.talent').remove();
+            });
+
+            Object.keys(saved).forEach(groupId => {
+                const group = $('#' + groupId);
+                if (!group.length) return;
+
+                Object.keys(saved[groupId]).forEach(columnClass => {
+                    const column = group.find('.column.' + columnClass).first();
+                    if (!column.length) return;
+
+                    Object.keys(saved[groupId][columnClass]).forEach(level => {
+                        const levelBox = column.find('.level.' + level).first();
+                        if (!levelBox.length) return;
+
+                        (saved[groupId][columnClass][level] || []).forEach(id => {
+                            const item = itemsById[id];
+                            if (item) {
+                                levelBox.append(item);
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        function getDataTransfer(event) {
+            return event.originalEvent && event.originalEvent.dataTransfer
+                ? event.originalEvent.dataTransfer
+                : event.dataTransfer;
+        }
+
+        // dataTransfer.getData() only returns real data on 'dragstart'/'drop' (empty on 'dragover'
+        // for security reasons), so track the dragged item directly instead.
+        let draggedItem = null;
+
+        $(document).on('dragstart', '.talent', function (event) {
+            const dt = getDataTransfer(event);
+            if (!dt) return;
+
+            draggedItem = $(this);
+            dt.setData('text/plain', String($(this).data('id')));
+            dt.effectAllowed = 'move';
+        });
+
+        $(document).on('dragend', '.talent', function () {
+            draggedItem = null;
+        });
+
+        $('div.level').on('dragover', function (event) {
+            const dt = getDataTransfer(event);
+            if (!dt || !draggedItem || !draggedItem.length) return;
+
+            const targetLevel = $(this).data('level');
+            const targetGroup = $(this).closest('.group').attr('id');
+
+            if (draggedItem.data('type') === targetGroup && draggedItem.data('level') === targetLevel) {
+                event.preventDefault();
+                dt.dropEffect = 'move';
+            }
+        });
+
+        $('div.level').on('drop', function (event) {
+            const dt = getDataTransfer(event);
+            if (!dt || !draggedItem || !draggedItem.length) return;
+
+            event.preventDefault();
+
+            const targetLevel = $(this).data('level');
+            const targetGroup = $(this).closest('.group').attr('id');
+
+            if (draggedItem.data('type') !== targetGroup || draggedItem.data('level') !== targetLevel) {
+                return;
+            }
+
+            $(this).append(draggedItem);
+            draggedItem = null;
+        });
+
+        $('#saveStateBtn').on('click', function () {
+            saveState();
+        });
+
+        $('#resetBtn').on('click', function () {
+            resetLayout();
+        });
+
+        renderDefaultLayout(TALENTS);
+
+        const saved = JSON.parse(localStorage.getItem('dragState')) || null;
+        if (saved) {
+            restoreState();
+        }
+    });
+</script>
+</body>
+</html>
