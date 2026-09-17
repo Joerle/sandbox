@@ -10,9 +10,9 @@ const ColourClock = (function () {
         get360fr24,
         get360fr365
     } = ColourUtils;
-    const { rgbToHex, maxSvToRgb } = ColourConvert;
+    const { rgbToHex, maxSvToRgb } = ColourConverter;
 
-    function dispTime(dayOfYear, hr, min, sec) {
+    function dispTime(doy, hr, min, sec) {
         hr = padTime10(hr);
         min = padTime10(min);
         sec = padTime10(sec);
@@ -20,9 +20,9 @@ const ColourClock = (function () {
         $("#hr div.time").text(hr);
         $("#min div.time").text(min);
         $("#sec div.time").text(sec);
-        $("title").text(hr + ":" + min + ":" + sec);
+        $("title").text(`${hr}:${min}:${sec}`);
 
-        $("#dayOfYear").text("day " + dayOfYear);
+        $("#dayOfYear").text(`day ${doy}`);
     }
 
     function dispHex(rgb) {
@@ -32,11 +32,11 @@ const ColourClock = (function () {
                 b: parseHex(rgb.b)
             },
             hexText = rgbToHex(rgb),
-            title = $("title").text() + " " + hexText;
+            title = `${$("title").text()} ${hexText}`;
 
-        $( "#hr div.hex").css("background-color", "#" + hex.r + "0000").text(hex.r);
-        $("#min div.hex").css("background-color", "#00" + hex.g + "00").text(hex.g);
-        $("#sec div.hex").css("background-color", "#0000" + hex.b).text(hex.b);
+        $( "#hr div.hex").css("background-color", `#${hex.r}0000`).text(hex.r);
+        $("#min div.hex").css("background-color", `#00${hex.g}00`).text(hex.g);
+        $("#sec div.hex").css("background-color", `#0000${hex.b}`).text(hex.b);
 
         $("title").text(title);
     }
@@ -48,14 +48,14 @@ const ColourClock = (function () {
                 b: get255fr60(sec)
             },
             title = $("title").text();
-        const rgbText = "rgb("+ rgb.r + ", " + rgb.g + ", " + rgb.b + ")";
+        const rgbText = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 
-        $( "#hr div.rgb").css("background-color", "rgb(" + rgb.r + ", 0, 0)").text(padTime100(rgb.r));
-        $("#min div.rgb").css("background-color", "rgb(0, " + rgb.g + ", 0)").text(padTime100(rgb.g));
-        $("#sec div.rgb").css("background-color", "rgb(0, 0, " + rgb.b + ")").text(padTime100(rgb.b));
+        $( "#hr div.rgb").css("background-color", `rgb(${rgb.r}, 0, 0)`).text(padTime100(rgb.r));
+        $("#min div.rgb").css("background-color", `rgb(0, ${rgb.g}, 0)`).text(padTime100(rgb.g));
+        $("#sec div.rgb").css("background-color", `rgb(0, 0, ${rgb.b})`).text(padTime100(rgb.b));
 
         $("#clock").css("background-color", rgbText);
-        $("title").text(title + " " + rgbText);
+        $("title").text(`${title} ${rgbText}`);
 
         dispHex(rgb);
     }
@@ -67,7 +67,7 @@ const ColourClock = (function () {
             sec360 = get360fr60(sec);
 
         const mode = $("[name='mode']:checked").val();
-        if (mode == "adpt") {
+        if (mode === "adpt") {
             const offset = 152;
             doy = doy >= offset ? 365 - (doy - offset) : offset - doy;
         }
@@ -79,17 +79,17 @@ const ColourClock = (function () {
             secHsv = maxSvToRgb(sec360),
             dayHsv = maxSvToRgb(day360);
 
-        const hrRgb = "rgb(" + hrHsv.r.toFixed(0) + ", " + hrHsv.g.toFixed(0) + ", " + hrHsv.b.toFixed(0) + ")",
-            minRgb = "rgb(" + minHsv.r.toFixed(0) + ", " + minHsv.g.toFixed(0) + ", " + minHsv.b.toFixed(0) + ")",
-            secRgb = "rgb(" + secHsv.r.toFixed(0) + ", " + secHsv.g.toFixed(0) + ", " + secHsv.b.toFixed(0) + ")",
-            dayRgb = "rgb(" + dayHsv.r.toFixed(0) + ", " + dayHsv.g.toFixed(0) + ", " + dayHsv.b.toFixed(0) + ")";
+        const hrRgb = `rgb(${hrHsv.r.toFixed(0)}, ${hrHsv.g.toFixed(0)}, ${hrHsv.b.toFixed(0)})`,
+            minRgb = `rgb(${minHsv.r.toFixed(0)}, ${minHsv.g.toFixed(0)}, ${minHsv.b.toFixed(0)})`,
+            secRgb = `rgb(${secHsv.r.toFixed(0)}, ${secHsv.g.toFixed(0)}, ${secHsv.b.toFixed(0)})`,
+            dayRgb = `rgb(${dayHsv.r.toFixed(0)}, ${dayHsv.g.toFixed(0)}, ${dayHsv.b.toFixed(0)})`;
 
         $( "#hr div.hue").text(hr360.toFixed(0)).css("background-color", hrRgb);
         $("#min div.hue").text(min360.toFixed(0)).css("background-color", minRgb);
         $("#sec div.hue").text(sec360.toFixed(0)).css("background-color", secRgb);
 
-        $("#one div.hue").css("background", "linear-gradient(to right, " + hrRgb + " , " + minRgb + ")");
-        $("#two div.hue").css("background", "linear-gradient(to right, " + minRgb + ", " + secRgb + ")");
+        $("#one div.hue").css("background", `linear-gradient(to right, ${hrRgb} , ${minRgb})`);
+        $("#two div.hue").css("background", `linear-gradient(to right, ${minRgb}, ${secRgb})`);
 
         $("body").css("background-color", dayRgb);
     }
@@ -101,27 +101,25 @@ const ColourClock = (function () {
     background: linear-gradient(to right, red , blue); //Standard syntax
 
     */
-    function startTime() {
-        const now = new Date(),
-            mill = now.getMilliseconds(),
-            doy = getDayOfYear(now);
-        let hr = now.getHours(),
-            min = now.getMinutes(),
-            sec = now.getSeconds();
-
-        dispTime(doy, hr, min, sec);
-
-        sec = sec + mill / 1000;
-        min = min  + sec / 60;
-        hr = hr + min / 60;
-
-        dispRGB(hr, min, sec);
-        dispHSB(doy, hr, min, sec);
-
-        setTimeout(startTime, 250);
-    }
-
     return {
-        startTime: startTime
+        startTime() {
+            const now = new Date(),
+                mill = now.getMilliseconds(),
+                doy = getDayOfYear(now);
+            let hr = now.getHours(),
+                min = now.getMinutes(),
+                sec = now.getSeconds();
+
+            dispTime(doy, hr, min, sec);
+
+            sec += mill / 1000;
+            min += sec / 60;
+            hr += min / 60;
+
+            dispRGB(hr, min, sec);
+            dispHSB(doy, hr, min, sec);
+
+            setTimeout(() => this.startTime(), 250);
+        }     
     };
 })();

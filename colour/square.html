@@ -10,14 +10,16 @@
     <script src="js/colour.js"></script>
     <link rel="stylesheet" type="text/css" href="css/square.css" />
     <script>
-jQuery(function () {
-    jQuery(".refbody").hide();
-    jQuery(".refnum").click(function (event) {
-        jQuery(this.nextSibling).toggle();
+$(function () {
+    ColourClock.startTime();
+
+    $(".refbody").hide();
+    $(".refnum").click(function (event) {
+        $(this.nextSibling).toggle();
         event.stopPropagation();
     });
-    jQuery("body").click(function (event) {
-        jQuery(".refbody").hide();
+    $("body").click(function (event) {
+        $(".refbody").hide();
     });
 });
 </script>

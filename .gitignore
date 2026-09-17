@@ -1,4 +1,5 @@
 
 #Don't include these projects
-andenginelivewallpaperextensionexample/*
-LiveWallpaper/*
+/andenginelivewallpaperextensionexample/*
+/LiveWallpaper/*
+/.vscode/*
