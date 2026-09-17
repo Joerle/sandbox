@@ -1,3 +1,6 @@
+const ColourConvert = (function () {
+    const { parseHex } = ColourUtils;
+
 function rgbToHex(r, g, b) {
     if (arguments.length < 3) {
         b = r.b;
@@ -17,13 +20,13 @@ function rgbToHsv(r, g, b) {
     g = g / 255;
     b = b / 255;
 
-    var rgb = [ r, g, b ],
-        max = Math.max(rgb) == 0 ? 0.01 : Math.max(rgb),
-        min = Math.min(rgb),
+    const rgb = [ r, g, b ],
+        max = Math.max(0.01, ...rgb),
+        min = Math.min(...rgb),
         diff = max - min;
 
-    var h = 1,
-        s = (max == 0 ? 0 : diff / max),
+    let h = 1;
+    const s = (max == 0 ? 0 : diff / max),
         v = max;
 
     if (max == min) {
@@ -31,13 +34,13 @@ function rgbToHsv(r, g, b) {
     } else {
         switch(max) {
             case r:
-                h = (g - b) / d + (g < b ? 6 : 0);
+                h = (g - b) / diff + (g < b ? 6 : 0);
                 break;
             case g:
-                h = (b - r) / d + 2;
+                h = (b - r) / diff + 2;
                 break;
             case b:
-                h = (r - g) / d + 4;
+                h = (r - g) / diff + 4;
                 break;
         }
 
@@ -74,11 +77,11 @@ function hsvToRgb(h, s, v) {
     s = s > 1 ? s/100 : s;
     v = v > 1 ? v/100 : v;
 
-    var r = 0,
+    let r = 0,
         g = 0,
         b = 0;
 
-    var h6 = h/60,
+    const h6 = h/60,
         i = Math.floor(h6),
         f = h6 - i,
         p = v * (1 - s),
@@ -128,11 +131,11 @@ function hsvToRgb(h, s, v) {
 }
 
 function maxSvToRgb(hue) {
-    var r = 0,
+    let r = 0,
         g = 0,
         b = 0;
 
-    var h6 = hue/60,
+    const h6 = hue/60,
         i = Math.floor(h6),
         f = h6 - i,
         q = (1 - f),
@@ -178,3 +181,8 @@ function maxSvToRgb(hue) {
     };
 }
 
+    return {
+        rgbToHex,
+        maxSvToRgb
+    };
+})();

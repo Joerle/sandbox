@@ -1,8 +1,10 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-	<title>Test</title>
-	<script src="jquery.js"></script>
-	<style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colour Calendar</title>
+<style>
 	body, div { margin: 0; padding: 0; font-family: tahoma; font-size: 10pt;}
 	#calendar div.month { float: left; }
 	#calendar div.month div.title { float: none; text-align: center; font-size: 12pt; }
@@ -11,33 +13,33 @@
 	div.day { height: 15px; padding: 1px; margin-bottom: 1px; clear: left; }
 	div.hour { width: 13px; height: 13px; padding: 1px; margin-bottom: 1px; font-size: 8pt; float: left; }
 
-	#m01 { background-color: #0080FF;}
-	#m02 { background-color: #00FFFF;}
-	#m03 { background-color: #00FF80;}
-	#m04 { background-color: #00FF00;}
-	#m05 { background-color: #80FF00;}
-	#m06 { background-color: #FFFF00;}
-	#m07 { background-color: #FF8000;}
-	#m08 { background-color: #FF0000;}
-	#m09 { background-color: #FF0080;}
-	#m10 { background-color: #FF00FF;}
-	#m11 { background-color: #8000FF;}
-	#m12 { background-color: #0000FF;}
+    #m01 { background-color: #0080FF; }
+    #m02 { background-color: #00FFFF; }
+    #m03 { background-color: #00FF80; }
+    #m04 { background-color: #00FF00; }
+    #m05 { background-color: #80FF00; }
+    #m06 { background-color: #FFFF00; }
+    #m07 { background-color: #FF8000; }
+    #m08 { background-color: #FF0000; }
+    #m09 { background-color: #FF0080; }
+    #m10 { background-color: #FF00FF; }
+    #m11 { background-color: #8000FF; }
+    #m12 { background-color: #0000FF; }
 
-/* #0080FF 210     33023 */
-/* #00FFFF 180     65535 */
-/* #00FF80 150     65408 */
-/* #00FF00 120     65280 */
-/* #80FF00 90    8453888 */
-/* #FFFF00 60   16776960 */
-/* #FF8000 30   16744448 */
-/* #FF0000 0    16711680 */
-/* #FF0080 330  16711808 */
-/* #FF00FF 300  16711935 */
-/* #8000FF 270   8388863 */
-/* #0000FF 240       255 */
+    /* #0080FF 210     33023 */
+    /* #00FFFF 180     65535 */
+    /* #00FF80 150     65408 */
+    /* #00FF00 120     65280 */
+    /* #80FF00 90    8453888 */
+    /* #FFFF00 60   16776960 */
+    /* #FF8000 30   16744448 */
+    /* #FF0000 0    16711680 */
+    /* #FF0080 330  16711808 */
+    /* #FF00FF 300  16711935 */
+    /* #8000FF 270   8388863 */
+    /* #0000FF 240       255 */
 
-/*
+    /*
 	#m01 div.d01 { background-color: #7C8084;}
 	#m01 div.d31 { background-color: #0080FF;}
 
@@ -62,14 +64,14 @@
 	#m11 div.d30 { background-color: #8000FF;}
 
 	#m12 div.d31 { background-color: #0000FF;}
-*/
+    */
 
-	</style>
-	<script>
+</style>
+<script>
 
 var jQ = jQuery.noConflict();
 
-function andShade (month) {
+function andShade(month) {
 
 	var len = month.toString.length,
 		id = len != 2 ? (len < 2 ? "0" + month : month.slice(len - 2)) : month,
@@ -93,7 +95,7 @@ function rgbToHsl(rgb) {
     } else {
         var d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch(max){
+        switch (max) {
             case r: h = (g - b) / d + (g < b ? 6 : 0); break;
             case g: h = (b - r) / d + 2; break;
             case b: h = (r - g) / d + 4; break;
@@ -115,7 +117,7 @@ function hslToRgb(h, s, l) {
     f = h * 6 - i;
     p = l * (1 - s);
     q = l * (1 - f * s);
-    t = l * (1 - (1 - f) * s);
+        t = l * (1 - (1 - f) * s);
     switch (i % 6) {
         case 0: r = l, g = t, b = p; break;
         case 1: r = q, g = l, b = p; break;
@@ -158,24 +160,24 @@ jQ( document ).ready(function () {
 				var bg = elem.currentStyle["backgroundColor"];
 			} else if (window.getComputedStyle) {}
 				var bg = document.defaultView.getComputedStyle(elem, null).getPropertyValue("background-color");
-            }
+}
 			if (bg.search("rgb") == -1) {
 				return bg;
 			} else {
 				bg = bg.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 				function hex(x) {
 					return ("0" + parseInt(x).toString(16)).slice(-2);
-				}
+}
 				return hex(bg[1]) + hex(bg[2]) + hex(bg[3]);
-			}
-		}
-	}
+            }
+        }
+    }
 
 	result = andShade(5);
 
 });
 
-	</script>
+    </script>
 </head>
 <body>
 
