@@ -239,18 +239,19 @@ $(function () {
         });
 
         $.each(talents, function (typeId, groupTalents) {
-            $.each(groupTalents, function (_, talent) {
-                const div = $('<div>', {
-                    text: talent.name,
-                    class: 'talent',
-                    draggable: true,
-                    'data-id': genHashId(talent.name),
-                    'data-level': talent.level,
-                    'data-type': typeId
-                });
+            $.each(groupTalents, function (columnClass, columnTalents) {
+                $.each(columnTalents, function (_, talent) {
+                    const div = $('<div>', {
+                        text: talent.name,
+                        class: 'talent',
+                        draggable: true,
+                        'data-id': genHashId(talent.name),
+                        'data-level': talent.level,
+                        'data-type': typeId
+                    });
 
-                const columnClass = (talent.default || 'available');
-                $('#' + typeId + ' .column.' + columnClass + ' .level.' + talent.level).append(div);
+                    $('#' + typeId + ' .column.' + columnClass + ' .level.' + talent.level).append(div);
+                });
             });
         });
     }
