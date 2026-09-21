@@ -29,19 +29,21 @@ Use these instructions when working in this workspace.
 - Use relative links for files within the workspace.
 - Update documentation when a change affects setup or behavior.
 
-## Testing and Validation
-
-- Run the narrowest relevant validation after each change.
-- Run syntax, lint, build, or test commands when available.
-- Report commands that could not be run and why.
-- For testing HTML, CSS, and JavaScript functionality, allow running a test or check if it doesn't involve launching a browser. Assume the user wishes to test manually, but provide the option for automated testing when feasible.
-
 ## Editing Rules
 
 - Inspect the current file before editing it.
 - Preserve user changes and work with a dirty working tree.
 - Do not commit changes or create branches unless explicitly requested.
 - Do not add comments unless they explain non-obvious behavior.
+- after editing a file, wait for confirmation of those edits before attempting to run any kind of test (especially a terminal command)
+  - always ask if a test of any kind is required for your edit
+
+## Testing and Validation
+
+- Run the narrowest relevant validation after each change.
+- Run syntax, lint, build, or test commands when available.
+- Report commands that could not be run and why.
+- For testing HTML, CSS, and JavaScript functionality, allow running a test or check if it doesn't involve launching a browser. Assume the user wishes to test manually, but provide the option for automated testing when feasible.
 
 ## Additional Preferences
 

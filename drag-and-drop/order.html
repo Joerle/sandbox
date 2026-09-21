@@ -86,6 +86,22 @@
                     cursor: grab;
                     font-size: 0.9em;
                 }
+
+            }
+            div.level.target {
+                background-color: #398a55;
+
+                h4 {
+                    color: #398a55;
+                    font-weight: bolder;
+                }
+            }
+            div.level.nop {
+                background-color: #8a3955;
+
+                h4 {
+                    color: #8a3955;
+                }
             }
 
         }
@@ -206,24 +222,36 @@ $(function () {
         localStorage.setItem('dragState', JSON.stringify(state));
     }
 
+    function genHashId(name) {
+        let hash = 2166136261;
+
+        for (let index = 0; index < name.length; index++) {
+            hash ^= name.charCodeAt(index);
+            hash = Math.imul(hash, 16777619);
+        }
+
+        return (hash >>> 0).toString(36);
+    }
+
     function renderDefaultLayout(talents) {
         $('.level').each(function () {
             $(this).find('.talent').remove();
         });
 
-        $.each(talents, function (_, talent) {
-            const div = $('<div>', {
-                text: talent.text,
-                class: 'talent',
-                draggable: true,
-                'data-id': talent.id,
-                'data-level': talent.level,
-                'data-type': talent.type
-            });
+        $.each(talents, function (typeId, groupTalents) {
+            $.each(groupTalents, function (_, talent) {
+                const div = $('<div>', {
+                    text: talent.name,
+                    class: 'talent',
+                    draggable: true,
+                    'data-id': genHashId(talent.name),
+                    'data-level': talent.level,
+                    'data-type': typeId
+                });
 
-            const groupId = talent.type || 'utility';
-            const columnClass = (talent.default || 'available');
-            $('#' + groupId + ' .column.' + columnClass + ' .level.' + talent.level).append(div);
+                const columnClass = (talent.default || 'available');
+                $('#' + typeId + ' .column.' + columnClass + ' .level.' + talent.level).append(div);
+            });
         });
     }
 
@@ -236,10 +264,10 @@ $(function () {
         const saved = JSON.parse(localStorage.getItem('dragState')) || null;
         if (!saved) return;
 
-        const hasSavedItems = Object.keys(saved).some(groupId =>
-            Object.keys(saved[groupId] || {}).some(columnId =>
-                Object.keys(saved[groupId][columnId] || {}).some(level =>
-                    (saved[groupId][columnId][level] || []).length > 0
+        const hasSavedItems = Object.keys(saved).some(typeId =>
+            Object.keys(saved[typeId] || {}).some(columnId =>
+                Object.keys(saved[typeId][columnId] || {}).some(level =>
+                    (saved[typeId][columnId][level] || []).length > 0
                 )
             )
         );
@@ -285,33 +313,60 @@ $(function () {
             : event.dataTransfer;
     }
 
-    // dataTransfer.getData() only returns real data on 'dragstart'/'drop' (empty on 'dragover'
-    // for security reasons), so track the dragged item directly instead.
+    function clearDragHighlights() {
+        $('div.level').removeClass('target nop');
+    }
+
+    function getColumnName(element) {
+        return $(element).closest('.column').hasClass('selected') ? 'selected' : 'available';
+    }
+
+    // dataTransfer.getData() only returns real data on 'dragstart'/'drop' (empty on 'dragover' for security reasons),
+    // so track the dragged item directly instead.
     let draggedItem = null;
 
     $(document).on('dragstart', '.talent', function (event) {
+        clearDragHighlights();
+
         const dt = getDataTransfer(event);
         if (!dt) return;
 
         draggedItem = $(this);
         dt.setData('text/plain', String($(this).data('id')));
         dt.effectAllowed = 'move';
+
+        const targetGroup = draggedItem.data('type'),
+            thisColumn = getColumnName(draggedItem),
+            targetColumn = thisColumn === "selected" ? "available" : "selected",
+            targetLevel = draggedItem.data('level'),
+            selector = `#${targetGroup} div.${targetColumn} div.level.${targetLevel}`;
+
+        draggedItem.data('column', targetColumn);
+        $(selector).addClass('target');
     });
 
     $(document).on('dragend', '.talent', function () {
+        clearDragHighlights();
         draggedItem = null;
     });
 
-    $('div.level').on('dragover', function (event) {
+    $('div.level').on('dragenter dragover', function (event) {
         const dt = getDataTransfer(event);
         if (!dt || !draggedItem || !draggedItem.length) return;
 
-        const targetLevel = $(this).data('level');
-        const targetGroup = $(this).closest('.group').attr('id');
+        const thisGroup = $(this).closest('.group').attr('id'),
+            thisColumn = getColumnName(this),
+            thisLevel = $(this).data('level'),
+            isAllowedGroup = draggedItem.data('type') === thisGroup;
 
-        if (draggedItem.data('type') === targetGroup && draggedItem.data('level') === targetLevel) {
+        $('div.level').removeClass('nop');
+
+        if (isAllowedGroup) {
             event.preventDefault();
             dt.dropEffect = 'move';
+        }
+        if (thisColumn === draggedItem.data('column') && thisLevel !== draggedItem.data("level")) {
+            $(`div#${draggedItem.data('type')} div.${draggedItem.data('column')} div.${thisLevel}`).addClass("nop");
         }
     });
 
@@ -321,14 +376,18 @@ $(function () {
 
         event.preventDefault();
 
-        const targetLevel = $(this).data('level');
         const targetGroup = $(this).closest('.group').attr('id');
 
-        if (draggedItem.data('type') !== targetGroup || draggedItem.data('level') !== targetLevel) {
+        if (draggedItem.data('type') !== targetGroup) {
+            clearDragHighlights();
             return;
         }
 
-        $(this).append(draggedItem);
+        const destinationLevel = $(this).closest('.column').find('.level.' + draggedItem.data('level')).first();
+        if (!destinationLevel.length) return;
+
+        destinationLevel.append(draggedItem);
+        clearDragHighlights();
         draggedItem = null;
     });
 
